@@ -2,14 +2,19 @@
     {
         static string ProcessData(string dataName)
         {
+            var startSync = DateTime.Now;
             Thread.Sleep(3000);
-            return $"Обработка '{dataName}' завершена за 3 секунды";
+            var endSync = DateTime.Now;
+            return $"Обработка '{dataName}' завершена за  {(endSync - startSync).TotalSeconds} секунды";
         }
 
         static async Task<string> ProcessDataAsync(string dataName)
         {
+            var startAsync = DateTime.Now;
             await Task.Delay(3000);
-            return $"Обработка '{dataName}' завершена за 3 секунды";
+            var endAsync = DateTime.Now;
+        return $"Обработка '{dataName}' завершена за  {(endAsync - startAsync).TotalSeconds} секунды";
+
         }
 
         static async Task Main(string[] args)
@@ -31,17 +36,14 @@
             var task2 = ProcessDataAsync("Файл 2");
             var task3 = ProcessDataAsync("Файл 3");
 
-            var allTasks = new[] { task1, task2, task3 };
+            var results = await Task.WhenAll(task1, task2, task3);
 
-            while (allTasks.Length > 0)
-            {
-                var finished = await Task.WhenAny(allTasks);
-                Console.WriteLine(await finished);
+            foreach (var result in results)
+                {
+                    Console.WriteLine(result);
+                }
 
-                allTasks = Array.FindAll(allTasks, t => !t.IsCompleted);
-            }
-
-            var endAsync = DateTime.Now;
+        var endAsync = DateTime.Now;
             Console.WriteLine($"Асинхронная обработка заняла: {(endAsync - startAsync).TotalSeconds} сек.");
         }
     }
